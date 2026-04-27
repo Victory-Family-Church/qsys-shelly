@@ -1,17 +1,15 @@
--- ============================================================
---  Shelly Dimmer – Q-SYS Plugin
---  Supports Gen1 (REST/GET) and Gen2 (JSON-RPC/POST) devices
--- ============================================================
+-- Basic Shelly Dimmer Plugin
+-- Raymond Dean @ VFC Cran
+-- Apri 2026
 
 PluginInfo = {
-  Name          = "Shelly~Dimmer",
-  Version       = "1.1.0",
-  BuildVersion  = "1.1.0.0",
-  Category      = "Lighting",
-  Author        = "Ray",
-  Description   = "Control a Shelly Dimmer (Gen1 or Gen2) via its local HTTP API"
+    Name = "Lighting~SHELLY DIMMER",
+    Version = "0.1A",
+    Id = "ShellyDimmerProd_0.1A@1447",
+    Author = "Raymond Dean @ VFC Cran",
+    Description = "Basic Shelly Dimmer Plugin",
+    ShowDebug = true,
 }
-
 -- ============================================================
 --  Pretty name
 -- ============================================================
