@@ -3,7 +3,7 @@
 -- Apri 2026
 
 PluginInfo = {
-    Name = "Lighting~SHELLY DIMMER",
+    Name = "Lighting~SHELLY_DIMMER",
     Version = "0.1A",
     Id = "ShellyDimmerProd_0.1A@1447",
     Author = "Raymond Dean @ VFC Cran",
@@ -29,7 +29,7 @@ function GetProperties()
     {
       Name  = "IP Address",
       Type  = "string",
-      Value = "192.168.1.100"
+      Value = "0.0.0.0"
     },
     {
       Name    = "Device Generation",
