@@ -287,14 +287,18 @@ if Controls then
       math.floor(brightness),
       transitionMs / 1000.0
     )
+    -- Debug: show the outgoing URL in the status field
+    Controls.status_message.String = "CMD: " .. url
     HttpClient.Download({
       Url     = url,
       Timeout = 5,
       EventHandler = function(tbl, code, data, err)
         if err then
-          setStatus(false, "Error: " .. tostring(err))
+          setStatus(false, "Err: " .. tostring(err))
         elseif code ~= 200 then
-          setStatus(false, "HTTP " .. tostring(code))
+          setStatus(false, "HTTP " .. tostring(code) .. " | " .. tostring(data))
+        else
+          setStatus(true, "OK: " .. tostring(data))
         end
       end
     })
