@@ -3,7 +3,7 @@
 --  Supports Gen1 (REST/GET) and Gen2 (JSON-RPC/POST) devices
 -- ============================================================
 
-local PluginInfo = {
+PluginInfo = {
   Name          = "Shelly~Dimmer",
   Version       = "1.1.0",
   BuildVersion  = "1.1.0.0",
