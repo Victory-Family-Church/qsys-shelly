@@ -238,7 +238,7 @@ if Controls then
           setStatus(false, "Offline")
           return
         end
-        local ok, p = pcall(rapidjson.decode, data)
+        local ok, p = pcall(json.decode, data)
         if not ok or not p then
           setStatus(false, "Parse error")
           return
@@ -260,7 +260,7 @@ if Controls then
   --  POST http://<ip>/rpc/Light.Set
   --  Body: { "id": 0, "on": true, "brightness": 75, "transition_duration": 0.5 }
   local function gen2SendCommand(on, brightness, transitionMs)
-    local body = rapidjson.encode({
+    local body = json.encode({
       id                  = 0,
       on                  = on,
       brightness          = math.floor(brightness),
@@ -284,7 +284,7 @@ if Controls then
 
   --  POST http://<ip>/rpc/Light.GetStatus   Body: { "id": 0 }
   local function gen2Poll()
-    local body = rapidjson.encode({ id = 0 })
+    local body = json.encode({ id = 0 })
     HttpClient.Upload({
       Url     = string.format("http://%s/rpc/Light.GetStatus", ip),
       Method  = "POST",
@@ -296,7 +296,7 @@ if Controls then
           setStatus(false, "Offline")
           return
         end
-        local ok, p = pcall(rapidjson.decode, data)
+        local ok, p = pcall(json.decode, data)
         if not ok or not p then
           setStatus(false, "Parse error")
           return
