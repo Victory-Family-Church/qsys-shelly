@@ -1,0 +1,226 @@
+-- ============================================================
+--  Manual Override Gate – Q-SYS Plugin
+--
+--  When Manual Mode is ON:  outputs follow UCI fader/toggle
+--  When Manual Mode is OFF: outputs follow Snapshot inputs
+-- ============================================================
+
+PluginInfo = {
+  Name         = "Manual~Override Gate",
+  Version      = "1.0.0",
+  BuildVersion = "1.0.0.0",
+  Category     = "Utilities",
+  Author       = "Ray",
+  Description  = "Gates between Snapshot and manual UCI control for a dimmer channel"
+}
+
+function GetPrettyName(props)
+  return "Manual Override Gate"
+end
+
+function GetProperties()
+  return {}
+end
+
+function RectifyProperties(props)
+  return props
+end
+
+-- ============================================================
+--  Controls
+-- ============================================================
+function GetControls(props)
+  return {
+    -- Gate switch
+    {
+      Name         = "manual_mode",
+      ControlType  = "Button",
+      ButtonType   = "Toggle",
+      DefaultValue = "0",
+      UserPin      = true,
+      PinStyle     = "Both",
+      Count        = 1
+    },
+    -- Manual inputs (from UCI)
+    {
+      Name         = "manual_brightness",
+      ControlType  = "Knob",
+      ControlUnit  = "Percent",
+      Min          = 0,
+      Max          = 100,
+      DefaultValue = "100",
+      UserPin      = true,
+      PinStyle     = "Input",
+      Count        = 1
+    },
+    {
+      Name         = "manual_power",
+      ControlType  = "Button",
+      ButtonType   = "Toggle",
+      DefaultValue = "0",
+      UserPin      = true,
+      PinStyle     = "Input",
+      Count        = 1
+    },
+    -- Snapshot inputs
+    {
+      Name         = "snapshot_brightness",
+      ControlType  = "Knob",
+      ControlUnit  = "Percent",
+      Min          = 0,
+      Max          = 100,
+      DefaultValue = "100",
+      UserPin      = true,
+      PinStyle     = "Input",
+      Count        = 1
+    },
+    {
+      Name         = "snapshot_power",
+      ControlType  = "Button",
+      ButtonType   = "Toggle",
+      DefaultValue = "0",
+      UserPin      = true,
+      PinStyle     = "Input",
+      Count        = 1
+    },
+    -- Outputs (to plugin)
+    {
+      Name         = "output_brightness",
+      ControlType  = "Knob",
+      ControlUnit  = "Percent",
+      Min          = 0,
+      Max          = 100,
+      DefaultValue = "100",
+      UserPin      = true,
+      PinStyle     = "Output",
+      Count        = 1
+    },
+    {
+      Name         = "output_power",
+      ControlType  = "Button",
+      ButtonType   = "Toggle",
+      DefaultValue = "0",
+      UserPin      = true,
+      PinStyle     = "Output",
+      Count        = 1
+    }
+  }
+end
+
+-- ============================================================
+--  Layout
+-- ============================================================
+function GetControlLayout(props)
+  local layout   = {}
+  local graphics = {}
+  local W = 220
+
+  table.insert(graphics, {
+    Type       = "Header",
+    Text       = "Manual Override Gate",
+    HTextAlign = "Center",
+    Color      = {40, 40, 40},
+    FontSize   = 13,
+    Position   = {0, 0},
+    Size       = {W, 32}
+  })
+
+  -- Section labels
+  table.insert(graphics, { Type = "Label", Text = "Manual (UCI)",    Position = {8,  38}, Size = {90, 16}, FontSize = 10 })
+  table.insert(graphics, { Type = "Label", Text = "Snapshot",        Position = {8,  98}, Size = {90, 16}, FontSize = 10 })
+  table.insert(graphics, { Type = "Label", Text = "Output",          Position = {8, 158}, Size = {90, 16}, FontSize = 10 })
+
+  layout["manual_mode"] = {
+    PrettyName     = "Manual Override",
+    Style          = "Button",
+    ButtonStyle    = "Toggle",
+    Legend         = "Manual Override",
+    Color          = {0, 160, 220},
+    OffColor       = {80, 80, 80},
+    UnlinkOffColor = true,
+    Position       = {8, 56},
+    Size           = {200, 30}
+  }
+
+  layout["manual_power"] = {
+    PrettyName  = "Manual Power",
+    Style       = "Button",
+    ButtonStyle = "Toggle",
+    Legend      = "Power",
+    Position    = {8, 90},
+    Size        = {60, 24}
+  }
+
+  layout["manual_brightness"] = {
+    PrettyName = "Manual Brightness",
+    Style      = "Knob",
+    Position   = {80, 90},
+    Size       = {60, 60}
+  }
+
+  layout["snapshot_power"] = {
+    PrettyName  = "Snapshot Power",
+    Style       = "Button",
+    ButtonStyle = "Toggle",
+    Legend      = "Power",
+    Position    = {8, 150},
+    Size        = {60, 24}
+  }
+
+  layout["snapshot_brightness"] = {
+    PrettyName = "Snapshot Brightness",
+    Style      = "Knob",
+    Position   = {80, 150},
+    Size       = {60, 60}
+  }
+
+  layout["output_power"] = {
+    PrettyName  = "Output Power",
+    Style       = "Button",
+    ButtonStyle = "Toggle",
+    Legend      = "Power",
+    Position    = {8, 210},
+    Size        = {60, 24}
+  }
+
+  layout["output_brightness"] = {
+    PrettyName = "Output Brightness",
+    Style      = "Knob",
+    Position   = {80, 210},
+    Size       = {60, 60}
+  }
+
+  return layout, graphics
+end
+
+-- ============================================================
+--  Runtime
+-- ============================================================
+if Controls then
+
+  local updating = false
+
+  local function update()
+    if updating then return end
+    updating = true
+    if Controls.manual_mode.Boolean then
+      Controls.output_brightness.Value = Controls.manual_brightness.Value
+      Controls.output_power.Boolean    = Controls.manual_power.Boolean
+    else
+      Controls.output_brightness.Value = Controls.snapshot_brightness.Value
+      Controls.output_power.Boolean    = Controls.snapshot_power.Boolean
+    end
+    updating = false
+  end
+
+  Controls.manual_mode.EventHandler         = update
+  Controls.manual_brightness.EventHandler   = update
+  Controls.manual_power.EventHandler        = update
+  Controls.snapshot_brightness.EventHandler = update
+  Controls.snapshot_power.EventHandler      = update
+
+  update()
+
+  print("[ManualOverrideGate] Initialized")
+
+end
