@@ -200,6 +200,25 @@ if Controls then
     Controls.status_message.String = msg or ""
   end
 
+  -- Lightweight JSON parser for flat Shelly response objects.
+  -- Handles booleans, numbers, and strings — no library required.
+  local function parseJson(s)
+    local t = {}
+    for k, v in s:gmatch('"([%w_]+)"%s*:%s*(true)') do
+      t[k] = true
+    end
+    for k, v in s:gmatch('"([%w_]+)"%s*:%s*(false)') do
+      t[k] = false
+    end
+    for k, v in s:gmatch('"([%w_]+)"%s*:%s*(-?%d+%.?%d*)') do
+      if t[k] == nil then t[k] = tonumber(v) end
+    end
+    for k, v in s:gmatch('"([%w_]+)"%s*:%s*"([^"]*)"') do
+      if t[k] == nil then t[k] = v end
+    end
+    return t
+  end
+
   -- ── Gen1 helpers ──────────────────────────────────────────
 
   --  GET http://<ip>/light/0?turn=on&brightness=75&transition=500
@@ -238,8 +257,8 @@ if Controls then
           setStatus(false, "Offline")
           return
         end
-        local ok, p = pcall(json.decode, data)
-        if not ok or not p then
+        local p = parseJson(data)
+        if not p then
           setStatus(false, "Parse error")
           return
         end
@@ -260,12 +279,12 @@ if Controls then
   --  POST http://<ip>/rpc/Light.Set
   --  Body: { "id": 0, "on": true, "brightness": 75, "transition_duration": 0.5 }
   local function gen2SendCommand(on, brightness, transitionMs)
-    local body = json.encode({
-      id                  = 0,
-      on                  = on,
-      brightness          = math.floor(brightness),
-      transition_duration = transitionMs / 1000.0   -- Gen2 uses seconds
-    })
+    local body = string.format(
+      '{"id":0,"on":%s,"brightness":%d,"transition_duration":%.3f}',
+      on and "true" or "false",
+      math.floor(brightness),
+      transitionMs / 1000.0
+    )
     HttpClient.Upload({
       Url     = string.format("http://%s/rpc/Light.Set", ip),
       Method  = "POST",
@@ -284,7 +303,7 @@ if Controls then
 
   --  POST http://<ip>/rpc/Light.GetStatus   Body: { "id": 0 }
   local function gen2Poll()
-    local body = json.encode({ id = 0 })
+    local body = '{"id":0}'
     HttpClient.Upload({
       Url     = string.format("http://%s/rpc/Light.GetStatus", ip),
       Method  = "POST",
@@ -296,8 +315,8 @@ if Controls then
           setStatus(false, "Offline")
           return
         end
-        local ok, p = pcall(json.decode, data)
-        if not ok or not p then
+        local p = parseJson(data)
+        if not p then
           setStatus(false, "Parse error")
           return
         end
