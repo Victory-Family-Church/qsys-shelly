@@ -6,14 +6,13 @@
 -- ============================================================
 
 PluginInfo = {
-  Name         = "Manual~Override Gate",
-  Version      = "1.0.0",
-  BuildVersion = "1.0.0.0",
-  Category     = "Utilities",
-  Author       = "Ray",
-  Description  = "Gates between Snapshot and manual UCI control for a dimmer channel"
+    Name = "OverrideGate",
+    Version = "0.1.3A",
+    Id = "OverrideGate",
+    Author = "Raymond Dean @ VFC Cran",
+    Description = "Dumb simple override Gate",
+    ShowDebug = true,
 }
-
 function GetPrettyName(props)
   return "Manual Override Gate"
 end
