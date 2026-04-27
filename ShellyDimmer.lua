@@ -4,7 +4,7 @@
 
 PluginInfo = {
     Name = "Lighting~SHELLY_DIMMER",
-    Version = "0.1A",
+    Version = "0.1.1A",
     Id = "ShellyDimmerProd_0.1A@1447",
     Author = "Raymond Dean @ VFC Cran",
     Description = "Basic Shelly Dimmer Plugin",
