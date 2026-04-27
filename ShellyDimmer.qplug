@@ -290,18 +290,19 @@ if Controls then
       math.floor(brightness),
       transitionMs / 1000.0
     )
-    -- Debug: show the outgoing URL in the status field
-    Controls.status_message.String = "CMD: " .. url
+    print("[ShellyDimmer] GET " .. url)
     HttpClient.Download({
       Url     = url,
       Timeout = 5,
       EventHandler = function(tbl, code, data, err)
         if err then
-          setStatus(false, "Err: " .. tostring(err))
+          print("[ShellyDimmer] CMD error: " .. tostring(err))
+          setStatus(false, "Command error")
         elseif code ~= 200 then
-          setStatus(false, "HTTP " .. tostring(code) .. " | " .. tostring(data))
+          print("[ShellyDimmer] CMD HTTP " .. tostring(code) .. " | " .. tostring(data))
+          setStatus(false, "HTTP " .. tostring(code))
         else
-          setStatus(true, "OK: " .. tostring(data))
+          print("[ShellyDimmer] CMD OK: " .. tostring(data))
         end
       end
     })
@@ -358,7 +359,7 @@ if Controls then
 
   Controls.power.EventHandler = function()
     if updating then return end
-    Controls.status_message.String = "CMD power: " .. tostring(Controls.power.Boolean)
+    print("[ShellyDimmer] Power → " .. tostring(Controls.power.Boolean))
     sendCommand(
       Controls.power.Boolean,
       Controls.brightness.Value,
@@ -372,7 +373,7 @@ if Controls then
     updating = true
     Controls.power.Boolean = on
     updating = false
-    Controls.status_message.String = "CMD brightness: " .. tostring(Controls.brightness.Value)
+    print("[ShellyDimmer] Brightness → " .. tostring(Controls.brightness.Value))
     sendCommand(on, Controls.brightness.Value, Controls.transition.Value)
   end
 
