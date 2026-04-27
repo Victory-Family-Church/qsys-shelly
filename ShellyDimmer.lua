@@ -358,6 +358,7 @@ if Controls then
   -- ── Control event handlers ────────────────────────────────
 
   Controls.power.EventHandler = function()
+    print("[ShellyDimmer] power EventHandler fired, updating=" .. tostring(updating))
     if updating then return end
     print("[ShellyDimmer] Power → " .. tostring(Controls.power.Boolean))
     sendCommand(
@@ -368,6 +369,7 @@ if Controls then
   end
 
   Controls.brightness.EventHandler = function()
+    print("[ShellyDimmer] brightness EventHandler fired, updating=" .. tostring(updating))
     if updating then return end
     local on = Controls.brightness.Value > 0
     updating = true
@@ -385,5 +387,7 @@ if Controls then
 
   -- Initial fetch
   pollDevice()
+
+  print("[ShellyDimmer] Initialized — gen=" .. gen .. " ip=" .. ip .. " poll=" .. tostring(pollInterval) .. "s")
 
 end  -- if Controls
