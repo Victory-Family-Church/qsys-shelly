@@ -29,7 +29,7 @@ function GetProperties()
     {
       Name  = "IP Address",
       Type  = "string",
-      Value = "192.168.1.100"
+      Value = "0.0.0.0"
     },
     {
       Name    = "Device Generation",
@@ -279,17 +279,16 @@ if Controls then
   --  POST http://<ip>/rpc/Light.Set
   --  Body: { "id": 0, "on": true, "brightness": 75, "transition_duration": 0.5 }
   local function gen2SendCommand(on, brightness, transitionMs)
-    local body = string.format(
-      '{"id":0,"on":%s,"brightness":%d,"transition_duration":%.3f}',
+    -- Gen2 supports GET with query params — avoids POST/body issues in Q-SYS
+    local url = string.format(
+      "http://%s/rpc/Light.Set?id=0&on=%s&brightness=%d&transition_duration=%.3f",
+      ip,
       on and "true" or "false",
       math.floor(brightness),
       transitionMs / 1000.0
     )
-    HttpClient.Upload({
-      Url     = string.format("http://%s/rpc/Light.Set", ip),
-      Method  = "POST",
-      Headers = { ["Content-Type"] = "application/json" },
-      Data    = body,
+    HttpClient.Download({
+      Url     = url,
       Timeout = 5,
       EventHandler = function(tbl, code, data, err)
         if err then
@@ -303,12 +302,8 @@ if Controls then
 
   --  POST http://<ip>/rpc/Light.GetStatus   Body: { "id": 0 }
   local function gen2Poll()
-    local body = '{"id":0}'
-    HttpClient.Upload({
-      Url     = string.format("http://%s/rpc/Light.GetStatus", ip),
-      Method  = "POST",
-      Headers = { ["Content-Type"] = "application/json" },
-      Data    = body,
+    HttpClient.Download({
+      Url     = string.format("http://%s/rpc/Light.GetStatus?id=0", ip),
       Timeout = 5,
       EventHandler = function(tbl, code, data, err)
         if err or code ~= 200 then
