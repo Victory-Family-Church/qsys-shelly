@@ -192,6 +192,7 @@ if Controls then
   local gen          = Properties["Device Generation"].Value   -- "Gen1" | "Gen2"
   local pollInterval = Properties["Poll Interval (s)"].Value
   local isGen2       = (gen == "Gen2")
+  local updating     = false   -- true while poll is writing controls; blocks EventHandlers
 
   -- ── Shared helpers ────────────────────────────────────────
 
@@ -263,8 +264,10 @@ if Controls then
           return
         end
         -- Gen1 fields: ison, brightness
+        updating = true
         Controls.power.Boolean    = p.ison       or false
         Controls.brightness.Value = p.brightness or 0
+        updating = false
         setStatus(true, string.format(
           "Online | %s | %d%%",
           p.ison and "ON" or "OFF",
@@ -320,8 +323,10 @@ if Controls then
           return
         end
         -- Gen2 fields: output (bool), brightness (number)
+        updating = true
         Controls.power.Boolean    = p.output     or false
         Controls.brightness.Value = p.brightness or 0
+        updating = false
         setStatus(true, string.format(
           "Online | %s | %d%%",
           p.output and "ON" or "OFF",
@@ -352,6 +357,8 @@ if Controls then
   -- ── Control event handlers ────────────────────────────────
 
   Controls.power.EventHandler = function()
+    if updating then return end
+    Controls.status_message.String = "CMD power: " .. tostring(Controls.power.Boolean)
     sendCommand(
       Controls.power.Boolean,
       Controls.brightness.Value,
@@ -360,8 +367,12 @@ if Controls then
   end
 
   Controls.brightness.EventHandler = function()
+    if updating then return end
     local on = Controls.brightness.Value > 0
+    updating = true
     Controls.power.Boolean = on
+    updating = false
+    Controls.status_message.String = "CMD brightness: " .. tostring(Controls.brightness.Value)
     sendCommand(on, Controls.brightness.Value, Controls.transition.Value)
   end
 
