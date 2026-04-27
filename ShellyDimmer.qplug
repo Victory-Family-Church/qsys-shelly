@@ -96,13 +96,13 @@ function GetControls(props)
       PinStyle     = "Both",
       Count        = 1
     },
-    -- Transition time (ms) – converted to seconds for Gen2
+    -- Transition time (ms) – converted to seconds for Gen2; minimum 1000
     {
       Name         = "transition",
       ControlType  = "Knob",
       ControlUnit  = "Integer",
-      DefaultValue = "500",
-      Min          = 0,
+      DefaultValue = "1000",
+      Min          = 1000,
       Max          = 5000,
       UserPin      = true,
       PinStyle     = "Both",
@@ -340,10 +340,11 @@ if Controls then
   -- ── Dispatch to correct generation ────────────────────────
 
   local function sendCommand(on, brightness, transitionMs)
+    local t = (transitionMs == 0) and 1000 or transitionMs
     if isGen2 then
-      gen2SendCommand(on, brightness, transitionMs)
+      gen2SendCommand(on, brightness, t)
     else
-      gen1SendCommand(on, brightness, transitionMs)
+      gen1SendCommand(on, brightness, t)
     end
   end
 
