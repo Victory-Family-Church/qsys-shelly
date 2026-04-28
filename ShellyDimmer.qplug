@@ -372,12 +372,8 @@ if Controls then
   Controls.brightness.EventHandler = function()
     print("[ShellyDimmer] brightness EventHandler fired, updating=" .. tostring(updating))
     if updating then return end
-    local on = Controls.brightness.Value > 0
-    updating = true
-    Controls.power.Boolean = on
-    updating = false
     print("[ShellyDimmer] Brightness → " .. tostring(Controls.brightness.Value))
-    sendCommand(on, Controls.brightness.Value, Controls.transition.Value)
+    sendCommand(Controls.power.Boolean, Controls.brightness.Value, Controls.transition.Value)
   end
 
   -- ── Poll timer ────────────────────────────────────────────
